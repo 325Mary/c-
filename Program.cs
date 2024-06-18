@@ -3,26 +3,24 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Management; // Necesario para consultas de gestión en Windows
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
-using System.Text;
+using System.Threading;
 using UserJwtAuthApp.Data;
 using UserJwtAuthApp.Services;
-using System.Runtime.InteropServices; 
-using System.Diagnostics; 
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("UserDb"));
 builder.Services.AddScoped<UserService>();
-builder.Services.AddSingleton<SystemInfoService>(); // Registrar el servicio aquí
 
+// Generación de clave JWT
 byte[] keyBytes = new byte[32]; // 256 bits / 8 = 32 bytes
-RandomNumberGenerator.Fill(keyBytes); // Uso del método estático
+RandomNumberGenerator.Fill(keyBytes);
 
 string base64Key = Convert.ToBase64String(keyBytes);
-Console.WriteLine("Clave secreta generada: " + base64Key);
-
 builder.Configuration["Jwt:Key"] = base64Key;
 
 builder.Services.AddAuthentication(options =>
@@ -33,11 +31,11 @@ builder.Services.AddAuthentication(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = false, // No validar el emisor
-        ValidateAudience = false, // No validar la audiencia
+        ValidateIssuer = false,
+        ValidateAudience = false,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(keyBytes) // Utiliza la clave generada
+        IssuerSigningKey = new SymmetricSecurityKey(keyBytes)
     };
 });
 
@@ -60,4 +58,35 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// Configurar temporizador para mostrar información de RAM cada 10 segundos
+var timer = new Timer(state =>
+{
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+    {
+        ObjectQuery query = new ObjectQuery("SELECT TotalVisibleMemorySize FROM Win32_OperatingSystem");
+        ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
+        ulong memorySizeGB = 0;
+
+        try
+        {
+            foreach (ManagementObject queryObj in searcher.Get())
+            {
+                ulong memorySizeKB = Convert.ToUInt64(queryObj["TotalVisibleMemorySize"]);
+                memorySizeGB = memorySizeKB / 1024 / 1024; // Convertir KB a GB
+            }
+
+            Console.WriteLine($"RAM total ejecutable: {memorySizeGB} GB");
+        }
+        catch (ManagementException e)
+        {
+            Console.WriteLine("Error al obtener la información de RAM: " + e.Message);
+        }
+    }
+    else
+    {
+        Console.WriteLine("La consulta de información del sistema solo es compatible con Windows.");
+    }
+}, 
+null, TimeSpan.Zero, TimeSpan.FromSeconds(10)
+); 
 app.Run();
