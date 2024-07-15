@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Producto.Services;
 using System;
 using System.Management; // Necesario para consultas de gestión en Windows
 using System.Runtime.InteropServices;
@@ -9,12 +10,16 @@ using System.Security.Cryptography;
 using System.Threading;
 using UserJwtAuthApp.Data;
 using UserJwtAuthApp.Services;
+using Producto.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("UserDb"));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("GestionProductos"));
+builder.Services.AddDbContext<ProductoContext>(options => options.UseInMemoryDatabase("GestionProductos"));
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IProductoService, ProductoService>();
+// builder.Services.AddSingleton(new prodc)
 
 // Generación de clave JWT
 byte[] keyBytes = new byte[32]; // 256 bits / 8 = 32 bytes
@@ -58,7 +63,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Configurar temporizador para mostrar información de RAM cada 10 segundos
 var timer = new Timer(state =>
 {
     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -87,6 +91,6 @@ var timer = new Timer(state =>
         Console.WriteLine("La consulta de información del sistema solo es compatible con Windows.");
     }
 }, 
-null, TimeSpan.Zero, TimeSpan.FromSeconds(10)
+null, TimeSpan.Zero, TimeSpan.FromSeconds(100)
 ); 
 app.Run();

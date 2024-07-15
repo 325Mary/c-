@@ -8,3 +8,4 @@ namespace UserJwtAuthApp.Models
         public string Role { get; set; } = string.Empty;
     }
 }
+ 
