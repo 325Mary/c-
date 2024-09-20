@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Producto.Models;
+using Productos.Models;
 using Producto.Data;
 
 namespace Producto.Services
@@ -17,12 +17,12 @@ namespace Producto.Services
             _context = context;
         }
 
-        public IEnumerable<Producto.Models.Producto> GetAllProductos()
+        public IEnumerable<Productos.Models.Productos> GetAllProductos()
         {
             return _context.Productos.ToList();
         } 
 
-        public Producto.Models.Producto GetProductoById(int id)
+        public Productos.Models.Productos GetProductoById(int id)
         {
             var producto= _context.Productos.FirstOrDefault(p => p.Id == id);
             if (producto == null)
@@ -32,13 +32,13 @@ namespace Producto.Services
             return producto;
         }
 
-        public void AddProducto(Producto.Models.Producto producto)
+        public void AddProducto(Productos.Models.Productos producto)
         {
             _context.Productos.Add(producto);
             _context.SaveChanges();
         }
 
-        public void UpdateProducto(Producto.Models.Producto producto)
+        public void UpdateProducto(Productos.Models.Productos producto)
         {
             var ProductoExistente = GetProductoById(producto.Id);
             if (ProductoExistente != null)

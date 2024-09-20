@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Producto.Services;
-using Producto.Models;
+using Productos.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Producto.Controllers
 {
@@ -35,14 +36,14 @@ namespace Producto.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddProducto(Models.Producto producto)
+        public IActionResult AddProducto(Productos.Models.Productos producto)
         {
             _productoService.AddProducto(producto);
             return CreatedAtAction(nameof(GetProductoById), new { id = producto.Id }, producto);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateProducto(int id, Models.Producto producto)
+        public IActionResult UpdateProducto(int id, Productos.Models.Productos producto)
         {
             if (id != producto.Id)
             {

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using UserJwtAuthApp.Models;
-using Producto.Models;
+using Productos.Models;
 using Categoria.Models;
 
 namespace UserJwtAuthApp.Data
@@ -18,7 +18,7 @@ namespace Producto.Data
     {
         public ProductoContext(DbContextOptions<ProductoContext> options) : base(options) { }
 
-        public DbSet<Producto.Models.Producto> Productos { get; set; }
+        public DbSet<Productos.Models.Productos> Productos { get; set; }
     }
 }
 

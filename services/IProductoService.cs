@@ -1,14 +1,14 @@
 using System.Collections.Generic;
-using Producto.Models;
+using Productos.Models;
 
 namespace Producto.Services
 {
     public interface IProductoService
     {
-        IEnumerable<Producto.Models.Producto> GetAllProductos();
-        Producto.Models.Producto GetProductoById(int id);
-        void AddProducto(Producto.Models.Producto producto);
-        void UpdateProducto(Producto.Models.Producto producto);
+        IEnumerable<Productos.Models.Productos> GetAllProductos();
+        Productos.Models.Productos GetProductoById(int id);
+        void AddProducto(Productos.Models.Productos producto);
+        void UpdateProducto(Productos.Models.Productos producto);
         void DeleteProducto(int id);
     }
 }
